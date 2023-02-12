@@ -27,11 +27,15 @@ type UserResponseBodyDTO struct {
 	CheckAccount []entities.CheckAccount
 }
 
-type UserLoginRequestDTO struct {
+type LoginRequestDTO struct {
 	Email    string `json:"email" form:"email"`
 	Password string `json:"password" form:"password"`
 }
 
 type UserLoginResponseBody struct {
 	AccessToken string `json:"access_token" form:"access_token"`
+}
+
+type UpdateExpends struct {
+	ExpendAverage int `json:"expend_average" form:"expend_average"`
 }

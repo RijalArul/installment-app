@@ -19,6 +19,7 @@ type User struct {
 	Selfie        string         `gorm:"not null" valid:"required~Your Selfie is required"`
 	ExpendAverage int            `gorm:"not null"`
 	CheckAccounts []CheckAccount `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	LoanLimits    []LoanLimit    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {

@@ -27,9 +27,19 @@ func ResponseBodyLogin(accessToken string) web.UserLoginResponseBody {
 	}
 }
 
+func ResponseBodyLoanLimit(loanLimit *entities.LoanLimit) web.LoanLimitResponseDTO {
+	return web.LoanLimitResponseDTO{
+		FirstMonth:  loanLimit.FirstMonth,
+		SecondMonth: loanLimit.SecondMonth,
+		ThirdMonth:  loanLimit.ThirdMonth,
+		FourthMonth: loanLimit.FourthMonth,
+	}
+}
+
 type UserService interface {
 	Register(userDto web.UserRegisterDTO, arrCheckKoran []*entities.CheckAccount, ctx *gin.Context) (web.UserResponseBodyDTO, error)
-	Login(userDTO web.UserLoginRequestDTO) (*entities.User, error)
+	Login(userDTO web.LoginRequestDTO) (*entities.User, error)
+	Update(userDTO web.UpdateExpends, userID uint) (*entities.LoanLimit, error)
 }
 
 type UserServiceImpl struct {
@@ -67,8 +77,30 @@ func (userService *UserServiceImpl) Register(userDto web.UserRegisterDTO, arrChe
 	return userBody, err
 }
 
-func (userService *UserServiceImpl) Login(userDTO web.UserLoginRequestDTO) (*entities.User, error) {
+func (userService *UserServiceImpl) Login(userDTO web.LoginRequestDTO) (*entities.User, error) {
 	login, err := userService.userRepository.FindByEmail(userDTO.Email)
 
 	return login, err
+}
+
+func (userService *UserServiceImpl) Update(userDTO web.UpdateExpends, userID uint) (*entities.LoanLimit, error) {
+	user, err := userService.userRepository.FindByID(userID)
+	user.ExpendAverage = userDTO.ExpendAverage
+	takeExpend := 25
+	result := 0
+	newExpend := []int{}
+	for i := 1; i <= 4; i++ {
+		result += user.ExpendAverage * (takeExpend + (i + 2)) / 100
+		newExpend = append(newExpend, result)
+	}
+	newLoanLimit := entities.LoanLimit{
+		UserID:      user.ID,
+		FirstMonth:  newExpend[0],
+		SecondMonth: newExpend[1],
+		ThirdMonth:  newExpend[2],
+		FourthMonth: newExpend[3],
+	}
+	updateUser, err := userService.userRepository.UpdateExpendAvg(*user, newLoanLimit)
+
+	return updateUser, err
 }

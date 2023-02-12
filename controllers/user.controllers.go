@@ -20,6 +20,7 @@ const (
 type UserController interface {
 	Register(ctx *gin.Context)
 	Login(ctx *gin.Context)
+	// Update(ctx)
 }
 
 type UserControllerImpl struct {
@@ -86,7 +87,7 @@ func (userController *UserControllerImpl) Register(ctx *gin.Context) {
 }
 
 func (userController *UserControllerImpl) Login(ctx *gin.Context) {
-	var inputLogin web.UserLoginRequestDTO
+	var inputLogin web.LoginRequestDTO
 	contentType := helpers.GetContentType(ctx)
 
 	if contentType == appJSON {
@@ -99,6 +100,7 @@ func (userController *UserControllerImpl) Login(ctx *gin.Context) {
 
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Email & Password Is Invalid"})
+		return
 	}
 
 	comparePass := helpers.ComparePass([]byte(loginUser.Password), []byte(inputLogin.Password))
@@ -109,8 +111,10 @@ func (userController *UserControllerImpl) Login(ctx *gin.Context) {
 			AccessToken: accessToken,
 		}
 		ResponseSuccess(http.StatusOK, ctx, loginBody)
+
 	} else {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Email & Password Is Invalid"})
+		return
 	}
 
 }
