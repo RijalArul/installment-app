@@ -11,6 +11,7 @@ import (
 
 type GoodsOwnerController interface {
 	Register(ctx *gin.Context)
+	Login(ctx *gin.Context)
 }
 
 type GoodsOwnerControllerImpl struct {
@@ -39,4 +40,35 @@ func (goodsOwnerController *GoodsOwnerControllerImpl) Register(ctx *gin.Context)
 	}
 
 	ResponseSuccess(http.StatusCreated, ctx, createGoodsOwner)
+}
+
+func (goodsOwnerController *GoodsOwnerControllerImpl) Login(ctx *gin.Context) {
+	var goodOwnerInput web.LoginRequestDTO
+	contentType := helpers.GetContentType(ctx)
+	if contentType == appJSON {
+		ctx.ShouldBindJSON(&goodOwnerInput)
+	} else {
+		ctx.ShouldBind(&goodOwnerInput)
+	}
+
+	loginGoodOwner, err := goodsOwnerController.goodsOwnerService.Login(goodOwnerInput)
+	comparePass := helpers.ComparePass([]byte(loginGoodOwner.Password), []byte(goodOwnerInput.Password))
+	accessToken := ""
+
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Email & Password Is Invalid"})
+		return
+	}
+
+	if comparePass == true {
+		accessToken = helpers.GenerateToken(loginGoodOwner.ID, loginGoodOwner.Email, "good-owners")
+		loginBody := web.UserLoginResponseBody{
+			AccessToken: accessToken,
+		}
+		ResponseSuccess(http.StatusOK, ctx, loginBody)
+		return
+	} else {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Email & Password Is Invalid"})
+		return
+	}
 }

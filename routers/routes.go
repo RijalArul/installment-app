@@ -47,6 +47,17 @@ func Routes() *gin.Engine {
 
 	{
 		goodsOwnerRouter.POST("/register", goodsOwnerController.Register)
+		goodsOwnerRouter.POST("/login", goodsOwnerController.Login)
+	}
+
+	goodRepository := repositories.NewGoodRepository(getDatabase)
+	goodService := services.NewGoodService(goodRepository)
+	goodController := controllers.NewGoodController(goodService)
+	goodRouter := router.Group("/goods")
+	{
+		goodRouter.Use(middlewares.Authenthication())
+		goodRouter.Use(middlewares.GoodsOwnerAuthorize())
+		goodRouter.POST("/", goodController.Create)
 	}
 	router.Run()
 

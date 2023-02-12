@@ -63,7 +63,7 @@ func (employeeController *EmployeeControllerImpl) Login(ctx *gin.Context) {
 	}
 
 	if comparePass == true {
-		accessToken = helpers.GenerateToken(loginEmp.ID, loginEmp.Email)
+		accessToken = helpers.GenerateToken(loginEmp.ID, loginEmp.Email, loginEmp.Role)
 		loginBody := web.UserLoginResponseBody{
 			AccessToken: accessToken,
 		}

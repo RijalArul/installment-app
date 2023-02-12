@@ -30,3 +30,27 @@ func AdminAuthorize() gin.HandlerFunc {
 		ctx.Next()
 	}
 }
+
+func GoodsOwnerAuthorize() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		db := databases.GetDB()
+		goodOwners := entities.GoodsOwner{}
+		userData := ctx.MustGet("userData").(jwt.MapClaims)
+		userID := uint(userData["id"].(float64))
+		userRole := userData["role"]
+
+		err := db.Model(goodOwners).Where("id = ?", userID).First(&goodOwners).Error
+
+		if err != nil {
+			ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "You can't access"})
+			return
+		}
+
+		if userRole != "good-owners" {
+			ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "You can't access"})
+			return
+		}
+
+		ctx.Next()
+	}
+}

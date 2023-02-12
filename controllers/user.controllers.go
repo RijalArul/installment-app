@@ -107,7 +107,7 @@ func (userController *UserControllerImpl) Login(ctx *gin.Context) {
 	comparePass := helpers.ComparePass([]byte(loginUser.Password), []byte(inputLogin.Password))
 	accessToken := ""
 	if comparePass == true {
-		accessToken = helpers.GenerateToken(loginUser.ID, loginUser.Email)
+		accessToken = helpers.GenerateToken(loginUser.ID, loginUser.Email, "customer")
 		loginBody := web.UserLoginResponseBody{
 			AccessToken: accessToken,
 		}
