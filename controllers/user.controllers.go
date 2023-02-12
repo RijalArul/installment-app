@@ -101,5 +101,16 @@ func (userController *UserControllerImpl) Login(ctx *gin.Context) {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Email & Password Is Invalid"})
 	}
 
-	ResponseSuccess(http.StatusOK, ctx, loginUser)
+	comparePass := helpers.ComparePass([]byte(loginUser.Password), []byte(inputLogin.Password))
+	accessToken := ""
+	if comparePass == true {
+		accessToken = helpers.GenerateToken(loginUser.ID, loginUser.Email)
+		loginBody := web.UserLoginResponseBody{
+			AccessToken: accessToken,
+		}
+		ResponseSuccess(http.StatusOK, ctx, loginBody)
+	} else {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Email & Password Is Invalid"})
+	}
+
 }
