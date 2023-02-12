@@ -9,6 +9,7 @@ import (
 	"test-kr-sigma/models/web"
 	"test-kr-sigma/services"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,7 +21,7 @@ const (
 type UserController interface {
 	Register(ctx *gin.Context)
 	Login(ctx *gin.Context)
-	// Update(ctx)
+	Update(ctx *gin.Context)
 }
 
 type UserControllerImpl struct {
@@ -117,4 +118,24 @@ func (userController *UserControllerImpl) Login(ctx *gin.Context) {
 		return
 	}
 
+}
+func (userController *UserControllerImpl) Update(ctx *gin.Context) {
+	var inputExpends web.UpdateExpends
+	contentType := helpers.GetContentType(ctx)
+	userData := ctx.MustGet("userData").(jwt.MapClaims)
+	userID := uint(userData["id"].(float64))
+
+	if contentType == appJSON {
+		ctx.ShouldBindJSON(&inputExpends)
+	} else {
+		ctx.ShouldBind(&inputExpends)
+	}
+
+	updateExtend, err := userController.userService.Update(inputExpends, userID)
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Bad Request"})
+	}
+
+	ResponseSuccess(http.StatusOK, ctx, updateExtend)
 }

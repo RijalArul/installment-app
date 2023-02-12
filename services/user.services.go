@@ -39,7 +39,7 @@ func ResponseBodyLoanLimit(loanLimit *entities.LoanLimit) web.LoanLimitResponseD
 type UserService interface {
 	Register(userDto web.UserRegisterDTO, arrCheckKoran []*entities.CheckAccount, ctx *gin.Context) (web.UserResponseBodyDTO, error)
 	Login(userDTO web.LoginRequestDTO) (*entities.User, error)
-	Update(userDTO web.UpdateExpends, userID uint) (*entities.LoanLimit, error)
+	Update(userDTO web.UpdateExpends, userID uint) (web.LoanLimitResponseDTO, error)
 }
 
 type UserServiceImpl struct {
@@ -83,7 +83,7 @@ func (userService *UserServiceImpl) Login(userDTO web.LoginRequestDTO) (*entitie
 	return login, err
 }
 
-func (userService *UserServiceImpl) Update(userDTO web.UpdateExpends, userID uint) (*entities.LoanLimit, error) {
+func (userService *UserServiceImpl) Update(userDTO web.UpdateExpends, userID uint) (web.LoanLimitResponseDTO, error) {
 	user, err := userService.userRepository.FindByID(userID)
 	user.ExpendAverage = userDTO.ExpendAverage
 	takeExpend := 25
@@ -102,5 +102,5 @@ func (userService *UserServiceImpl) Update(userDTO web.UpdateExpends, userID uin
 	}
 	updateUser, err := userService.userRepository.UpdateExpendAvg(*user, newLoanLimit)
 
-	return updateUser, err
+	return ResponseBodyLoanLimit(updateUser), err
 }

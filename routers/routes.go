@@ -25,16 +25,28 @@ func Routes() *gin.Engine {
 	{
 		userRouter.POST("/register", middlewares.ValidateKTP(), middlewares.ValidateSelfie(), userController.Register)
 		userRouter.POST("/login", userController.Login)
+		userRouter.Use(middlewares.Authenthication())
+		userRouter.Use(middlewares.AdminAuthorize())
+		userRouter.PUT("/:id", userController.Update)
 	}
 
 	employeeRepository := repositories.NewEmployeeRepository(getDatabase)
 	employeeService := services.NewEmployeeService(employeeRepository)
 	employeeController := controllers.NewEmployeeController(employeeService)
-
 	employeeRouter := router.Group("/employees")
 	{
 		employeeRouter.POST("/register", employeeController.Register)
+
 		employeeRouter.POST("/login", employeeController.Login)
+	}
+
+	goodsOwnerRepository := repositories.NewGoodOwnerRepository(getDatabase)
+	goodsOwnerService := services.NewGoodOwnerService(goodsOwnerRepository)
+	goodsOwnerController := controllers.NewGoodOwnerController(goodsOwnerService)
+	goodsOwnerRouter := router.Group("/goodsOwners")
+
+	{
+		goodsOwnerRouter.POST("/register", goodsOwnerController.Register)
 	}
 	router.Run()
 
