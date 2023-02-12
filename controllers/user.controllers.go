@@ -14,10 +14,12 @@ import (
 
 const (
 	MIMEMultipartPOSTForm = "multipart/form-data"
+	appJSON               = "application/json"
 )
 
 type UserController interface {
 	Register(ctx *gin.Context)
+	Login(ctx *gin.Context)
 }
 
 type UserControllerImpl struct {
@@ -63,8 +65,6 @@ func (userController *UserControllerImpl) Register(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	// userEntity.KTP = middlewares.UploadKTP(ctx)
-	// userEntity.Selfie = middlewares.UploadSelfie(ctx)
 
 	rekKoran := middlewares.UploadRekKoran(ctx)
 	arrRekKoran := []*entities.CheckAccount{}
@@ -81,7 +81,25 @@ func (userController *UserControllerImpl) Register(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	// if err
 
 	ResponseSuccess(http.StatusCreated, ctx, createUser)
+}
+
+func (userController *UserControllerImpl) Login(ctx *gin.Context) {
+	var inputLogin web.UserLoginRequestDTO
+	contentType := helpers.GetContentType(ctx)
+
+	if contentType == appJSON {
+		ctx.ShouldBindJSON(&inputLogin)
+	} else {
+		ctx.ShouldBind(&inputLogin)
+	}
+
+	loginUser, err := userController.userService.Login(inputLogin)
+
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Email & Password Is Invalid"})
+	}
+
+	ResponseSuccess(http.StatusOK, ctx, loginUser)
 }

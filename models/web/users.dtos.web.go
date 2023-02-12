@@ -26,3 +26,12 @@ type UserResponseBodyDTO struct {
 	Selfie       string `json:"selfie" form:"selfie"`
 	CheckAccount []entities.CheckAccount
 }
+
+type UserLoginRequestDTO struct {
+	Email    string `json:"email" form:"email"`
+	Password string `json:"password" form:"password"`
+}
+
+type UserLoginResponseBody struct {
+	AccessToken string `json:"access_token" form:"access_token"`
+}

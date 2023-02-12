@@ -10,6 +10,7 @@ import (
 
 type UserRepository interface {
 	Regsiter(user entities.User, arrRekKoranDTO []*entities.CheckAccount, ctx *gin.Context) (*entities.User, error)
+	FindByEmail(email string) (*entities.User, error)
 }
 
 type UserRepositoryImpl struct {
@@ -30,7 +31,7 @@ func (u *UserRepositoryImpl) Regsiter(user entities.User, arrRekKoranDTO []*enti
 	}()
 
 	if err := tx.Error; err != nil {
-		// log.Fatal(err)
+
 		return nil, err
 	}
 
@@ -53,4 +54,11 @@ func (u *UserRepositoryImpl) Regsiter(user entities.User, arrRekKoranDTO []*enti
 	}
 
 	return &user, tx.Commit().Error
+}
+
+func (u *UserRepositoryImpl) FindByEmail(email string) (*entities.User, error) {
+	var getUser entities.User
+	err := u.db.Model(&getUser).Where("email = ?", email).First(&getUser).Error
+
+	return &getUser, err
 }

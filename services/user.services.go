@@ -1,6 +1,7 @@
 package services
 
 import (
+	"test-kr-sigma/helpers"
 	"test-kr-sigma/middlewares"
 	"test-kr-sigma/models/entities"
 	"test-kr-sigma/models/web"
@@ -21,8 +22,15 @@ func ResponseBodyUser(user *entities.User) web.UserResponseBodyDTO {
 	}
 }
 
+func ResponseBodyLogin(accessToken string) web.UserLoginResponseBody {
+	return web.UserLoginResponseBody{
+		AccessToken: accessToken,
+	}
+}
+
 type UserService interface {
 	Register(userDto web.UserRegisterDTO, arrCheckKoran []*entities.CheckAccount, ctx *gin.Context) (web.UserResponseBodyDTO, error)
+	Login(userDTO web.UserLoginRequestDTO) (web.UserLoginResponseBody, error)
 }
 
 type UserServiceImpl struct {
@@ -58,4 +66,17 @@ func (userService *UserServiceImpl) Register(userDto web.UserRegisterDTO, arrChe
 		Selfie:     createUser.Selfie,
 	}
 	return userBody, err
+}
+
+func (userService *UserServiceImpl) Login(userDTO web.UserLoginRequestDTO) (web.UserLoginResponseBody, error) {
+	login, err := userService.userRepository.FindByEmail(userDTO.Email)
+	comparePass := helpers.ComparePass([]byte(login.Password), []byte(userDTO.Password))
+	accessToken := ""
+	if comparePass == true {
+		accessToken = helpers.GenerateToken(login.ID, login.Email)
+	}
+	loginBody := web.UserLoginResponseBody{
+		AccessToken: accessToken,
+	}
+	return loginBody, err
 }

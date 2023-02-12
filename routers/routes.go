@@ -11,17 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//	func uploadFiles(ctx *gin.Context) {
-//		fileKTP := middlewares.UploadKTP(ctx)
-//		fileSelfie := middlewares.UploadSelfie(ctx)
-//		filesRekKoran := middlewares.UploadRekKoran(ctx)
-//		ctx.JSON(http.StatusOK, gin.H{
-//			"ktp":       fileKTP,
-//			"selfie":    fileSelfie,
-//			"rek_koran": filesRekKoran,
-//		})
-//	}
-
 func Routes() *gin.Engine {
 
 	router := gin.Default()
@@ -35,6 +24,7 @@ func Routes() *gin.Engine {
 
 	{
 		userRouter.POST("/register", middlewares.ValidateKTP(), middlewares.ValidateSelfie(), userController.Register)
+		userRouter.POST("/login", userController.Login)
 	}
 	router.Run()
 
