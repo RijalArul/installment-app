@@ -37,7 +37,7 @@ func StartDB() {
 		panic(err)
 	}
 
-	DB.AutoMigrate(&entities.User{}, &entities.CheckAccount{}, &entities.Good{}, &entities.LoanLimit{}, &entities.Employee{}, &entities.GoodsOwner{})
+	DB.AutoMigrate(&entities.User{}, &entities.CheckAccount{}, &entities.Good{}, &entities.LoanLimit{}, &entities.Employee{}, &entities.GoodsOwner{}, &entities.Installment{})
 
 }
 

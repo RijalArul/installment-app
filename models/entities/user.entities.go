@@ -20,6 +20,7 @@ type User struct {
 	ExpendAverage int            `gorm:"not null"`
 	CheckAccounts []CheckAccount `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	LoanLimits    []LoanLimit    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Installments  []Installment  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {

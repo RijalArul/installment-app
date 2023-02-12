@@ -14,6 +14,7 @@ type UserRepository interface {
 	FindByEmail(email string) (*entities.User, error)
 	FindByID(userId uint) (*entities.User, error)
 	UpdateExpendAvg(user entities.User, loanLimit entities.LoanLimit) (*entities.LoanLimit, error)
+	FindLoanByID(loanID uint) (*entities.LoanLimit, error)
 }
 
 type UserRepositoryImpl struct {
@@ -95,4 +96,10 @@ func (u *UserRepositoryImpl) UpdateExpendAvg(user entities.User, loanLimit entit
 		tx.Rollback()
 	}
 	return &loanLimit, tx.Commit().Error
+}
+
+func (u *UserRepositoryImpl) FindLoanByID(loanID uint) (*entities.LoanLimit, error) {
+	var loanLimit entities.LoanLimit
+	err := u.db.Model(loanLimit).Where("id = ?", loanID).First(&loanLimit).Error
+	return &loanLimit, err
 }

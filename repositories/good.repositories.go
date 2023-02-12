@@ -8,6 +8,7 @@ import (
 
 type GoodRepository interface {
 	Create(good entities.Good) (*entities.Good, error)
+	FindBySlug(slug string) (*entities.Good, error)
 }
 
 type GoodRepositoryImpl struct {
@@ -15,10 +16,16 @@ type GoodRepositoryImpl struct {
 }
 
 func NewGoodRepository(DB *gorm.DB) GoodRepository {
-	return &GoodOwnerRepositoryImpl{db: DB}
+	return &GoodRepositoryImpl{db: DB}
 }
 
-func (g *GoodOwnerRepositoryImpl) Create(good entities.Good) (*entities.Good, error) {
+func (g *GoodRepositoryImpl) Create(good entities.Good) (*entities.Good, error) {
 	err := g.db.Create(&good).Error
+	return &good, err
+}
+
+func (g *GoodRepositoryImpl) FindBySlug(slug string) (*entities.Good, error) {
+	var good entities.Good
+	err := g.db.Model(good).Where("slug = ?", slug).First(&good).Error
 	return &good, err
 }

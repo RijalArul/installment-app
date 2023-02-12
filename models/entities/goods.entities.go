@@ -12,6 +12,7 @@ type Good struct {
 	Price        int    `gorm:"not null" valid:"required~Your Price Goods is required"`
 	Rate         int    `gorm:"not null" valid:"required~Your Interest Rate is required"`
 	GoodsOwnerID uint
+	Installments []Installment `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	GoodsOwner   *GoodsOwner
 }
 

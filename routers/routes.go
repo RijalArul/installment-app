@@ -59,6 +59,16 @@ func Routes() *gin.Engine {
 		goodRouter.Use(middlewares.GoodsOwnerAuthorize())
 		goodRouter.POST("/", goodController.Create)
 	}
+
+	installmentRepository := repositories.NewInstallmentRepository(getDatabase)
+	installmentService := services.NewInstallmentService(installmentRepository, userRepository, goodRepository)
+	installmentController := controllers.NewInstallmentController(installmentService)
+	installmentRouter := router.Group("/installments")
+
+	{
+		installmentRouter.Use(middlewares.Authenthication())
+		installmentRouter.POST("/:loanLimitID/:goodSlug", middlewares.CustomerAuthorize(), installmentController.Create)
+	}
 	router.Run()
 
 	return router
