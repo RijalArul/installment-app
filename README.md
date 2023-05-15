@@ -1,1 +1,1 @@
-# test-kr-sigma
+# installment-app
